@@ -24,15 +24,15 @@ WHERE
 
 // Question #10
 SELECT
-    artist.artist_name AS "Artist Name",
+    customer.cust_name AS "Customer Name",
     artwork.work_title AS "Work Title",
     CONCAT('£', artwork.price) AS "Price"
 FROM
-    artwork
+    customer
 JOIN
-    purchase ON artwork.artwork_id = purchase.artwork_id
+    purchase ON customer.cust_id = purchase.cust_id
 JOIN
-    artist ON purchase.cust_id = artist.artist_id
+    artwork ON purchase.artwork_id = artwork.artwork_id
 WHERE
     artwork.price <= 200
 ORDER BY
