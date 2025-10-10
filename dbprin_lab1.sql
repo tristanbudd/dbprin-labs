@@ -1,4 +1,4 @@
-// Question #8
+-- Question #8
 SELECT
     artist.artist_name AS "Artist Name"
 FROM
@@ -10,7 +10,7 @@ JOIN
 WHERE
     artwork.work_title = 'Rainbow';
 
-// Question #9
+-- Question #9
 SELECT
     artwork.work_title AS "Work Title"
 FROM
@@ -22,7 +22,7 @@ JOIN
 WHERE
     artist.artist_name = 'Lolo';
 
-// Question #10
+-- Question #10
 SELECT
     customer.cust_name AS "Customer Name",
     artwork.work_title AS "Work Title",
