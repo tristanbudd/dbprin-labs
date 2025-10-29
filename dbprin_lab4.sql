@@ -270,3 +270,116 @@ WHERE
   flights
    /
 routes
+
+-- Question #13
+SELECT
+    o.o_id,
+    c.customer_name,
+    SUM(oi.quantity * oi.unit_price) AS total
+FROM
+    orders o
+JOIN
+    orderitems oi ON o.o_id = oi.o_id
+JOIN
+    products p ON oi.product_id = p.product_id
+JOIN
+    customers c ON o.customer_id = c.customer_id
+WHERE
+    p.category = 'Accessories' AND o.order_date >= DATE '2024-01-01'
+GROUP BY
+    o.o_id, c.customer_name;
+
+-- Relational Algebra
+γ o.o_id, c.customer_name; SUM(oi.quantity * oi.unit_price) (
+    (
+        ( (σ o.order_date >= DATE '2024-01-01' (orders))
+          ⨝ o.o_id = oi.o_id orderitems
+        )
+        ⨝ oi.product_id = p.product_id (σ p.category = 'Accessories' (products))
+    )
+    ⨝ o.customer_id = c.customer_id customers
+)
+
+-- Query Tree
+        π o.o_id, c.customer_name, total
+                     │
+γ o.o_id, c.customer_name; SUM(oi.quantity * oi.unit_price) -> total
+                     │
+        ⋈ o.customer_id = c.customer_id
+            /                        \
+    ⋈ oi.product_id = p.product_id   customers (c)
+          /                     \
+  ⋈ o.o_id = oi.o_id     (σ p.category = 'Accessories')
+     /        \                    \
+(σ o.order_date >= DATE '2024-01-01')  orderitems   products (p)
+        /           \
+  orders (o)      orderitems (oi)
+
+-- Key Changes:
+-- - p.category = 'Accessories' pushed to products so only accessory products are joined, not everything.
+-- - o.order_date >=  DATE '2024-01-01' also pushed to orders to only join relevant data.
+
+-- Question #14
+π d.department_name, p.project_name
+              │
+     ⟕ e.dept_id = d.dept_id
+              │
+     ⟕ d.dept_id = p.dept_id
+         /                  \
+   departments             projects
+         \
+        employees
+-- Correct Approach ^
+
+-- - Using left join ensures all departments are preserved and still display even if there are no matches under projects or employees.
+-- - Missing data can just be returned as NULL, or can use COALESCE to display N/A e.t.c
+-- - Using RIGHT JOIN in Option C means not starting from the main table of departments, it will likely work most of the time but isn't the best option for satisfying the requirements.
+
+-- If you swapped LEFT and RIGHT joins, it would still return the same result, but it could make the query less readable and risk including unrelated rows if join directions aren’t applied carefully.
+
+-- Question #15
+SELECT
+    s.name AS "Student Name",
+    c.course_name AS "Course Name",
+    m.module_name AS "Module Name",
+    l.name AS "Lecturer Name"
+FROM
+    students s
+JOIN
+    enrolments e ON s.student_id = e.student_id
+JOIN
+    courses c ON e.course_id = c.course_id
+JOIN
+    modules m ON c.course_id = m.course_id
+JOIN
+    lecturers l ON m.lecturer_id = l.lecturer_id
+WHERE
+    c.course_name = 'Software Engineering';
+
+-- Relational Algebra
+π s.name, c.course_name, m.module_name, l.name (
+    σ c.course_name = 'Software Engineering'
+    (
+        ((((students ⨝ s.student_id = e.student_id enrolments)
+           ⨝ e.course_id = c.course_id courses)
+           ⨝ c.course_id = m.course_id modules)
+           ⨝ m.lecturer_id = l.lecturer_id lecturers)
+    )
+)
+
+-- Query Tree
+     π s.name, c.course_name, m.module_name, l.name  -- Root (Final Result)
+                          │
+        σ c.course_name = 'Software Engineering'  -- Node (Filter)
+                          │
+            ⋈ m.lecturer_id = l.lecturer_id  -- Join (#4)
+                 /                       \
+     ⋈ c.course_id = m.course_id         lecturers  -- Join (#3) & Leaf (Base Table)
+          /                    \
+ ⋈ e.course_id = c.course_id    modules  -- Join (#2) & Leaf (Base Table)
+      /                 \
+⋈ s.student_id = e.student_id   courses  -- Join (#1) & Leaf (Base Table)
+     /
+ students  -- Leaf (Base Table)
+       \
+     enrolments  -- Leaf (Base Table)
