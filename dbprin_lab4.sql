@@ -196,9 +196,9 @@ WHERE
             σ g.genre_name = 'Science Fiction' -- Node (Filter)
                      │
                 ⋈ b.genre_id = g.genre_id -- Join (#3)
-                 /                          \
+                    /                  \
         ⋈ l.book_id = b.book_id       genres -- Join (#2) & Leaf (Base Table)
-         /                              \
+            /                 \
 ⋈ m.member_id = l.member_id  books -- Join (#1) & Leaf (Base Table)
      /
   members -- Leaf (Base Table)
@@ -220,16 +220,16 @@ WHERE
     ca.category_name = 'Electronics';
 
 -- Query Tree
-             π p.name, ca.category_name, cu.cust_name
-                               │
-               ⋈ s.customer_id = cu.customer_id
-                 /                                   \
-      ⋈ p.category_id = ca.category_id    customers
-             /                          \
-            /              σ ca.category_name = 'Electronics'
-⋈ p.product_id = s.product_id                |
-     /                \                         categories
- products            sales
+             π p.name, ca.category_name, cu.cust_name
+                               │
+               ⋈ s.customer_id = cu.customer_id
+                 /                                   \
+      ⋈ p.category_id = ca.category_id    customers
+             /                          \
+            /              σ ca.category_name = 'Electronics'
+⋈ p.product_id = s.product_id                |
+     /                \                         categories
+ products            sales
 
 -- Question #9
 SELECT
@@ -262,9 +262,9 @@ WHERE
             σ l.airline_name = 'SkyJet'
                      │
             ⋈ f.airline_id = l.airline_id
-                 /                           \
+                 /                           \
     ⋈ r.destination_id = a.airport_id  airlines
-       /                                    \
+       /                                    \
 ⋈ f.route_id = r.route_id     airports
      /
   flights
